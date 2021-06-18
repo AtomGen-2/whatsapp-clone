@@ -17,6 +17,7 @@ function Chat() {
         // this will prevent intermediate letters.
         e.preventDefault();
         console.log("You typed >>>", input)
+        setInput("");
     }
 
     useEffect(()=>{
