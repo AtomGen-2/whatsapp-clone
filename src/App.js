@@ -1,25 +1,33 @@
 import './App.css';
+import React, { useState } from "react";
 import Sidebar from './Sidebar.js';
 import Chat from './Chat.js';
+import Login from './Login.js';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 // third party imports
 
 function App() {
+  const [user, setUser]  =useState(null);
   return (
     <div className='app'>
-      <div className='app_body'>
+      {!user ? (
+        <Login/>
+      ):(
+        <div className='app_body'>        
         <Router>
           <Switch>
-            <Sidebar/>
-            <Route exact path="/">
-              {/* <Chat/> */}
-            </Route>
-            <Route path="/rooms/:roomId">              
+          <Route path="/rooms/:roomId">
+              <Sidebar/>
               <Chat/>
+            </Route>
+            <Route path="/">
+              <Sidebar/>
             </Route>
           </Switch>
         </Router>
+        <Router/>
       </div>
+      )}
     </div>
   );
 }
