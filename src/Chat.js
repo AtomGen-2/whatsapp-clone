@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react'
 import './Chat.css'
 import { Avatar } from '@material-ui/core';
 import { useParams } from "react-router-dom";
+import {useStateValue} from "./StateProvider";
+
 // material imports
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -10,27 +12,47 @@ import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import MicIcon from '@material-ui/icons/Mic';
 // firebase
-import db from "./firebase"
+import db from "./firebase";
+import firebase from "firebase";
 
 function Chat() {
     const [seed, setSeed] = useState('');
     const [input, setInput] = useState('');
     const { roomId } = useParams();
     const [roomName, setRoomName] = useState("");
+    const [messages, setMessages] = useState([]);
+    const [{user}, dispatch] = useStateValue();
 
     useEffect(()=>{
         if(roomId){
-            db.collection('rooms').doc(roomId).onSnapshot(snapshot => (
+            db.collection('rooms')
+            .doc(roomId)
+            .onSnapshot((snapshot) => (
                 setRoomName(snapshot.data().name)
             ))
+            db.collection('rooms')
+            .doc(roomId)
+            .collection('messages')
+            .orderBy("timestamp", "asc")
+            .onSnapshot((snapshot)=>
+                setMessages(snapshot.docs.map((doc) => doc.data()))
+            );
         }
     }, [roomId])
     // console.log(input);
     const sendMessage = (e) => {
         // this will prevent intermediate letters.
         e.preventDefault();
-        console.log("You typed >>>", input)
+        console.log("You typed >>>", input);
+
+        db.collection('rooms').doc(roomId).collection('messages').add({
+            message:input,
+            name: user.displayName,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+
         setInput("");
+        console.log(user.displayName);
     }
 
     useEffect(()=>{
@@ -56,12 +78,20 @@ function Chat() {
                     </IconButton>
                 </div>
             </div>
+            
             <div className="chat__body">
-                <p className="chat__message chat___receiver">
-                <span className="chat__name">Vedant</span>
-                    Hey Guys
-                    <span className="chat__timestamp">4:52pm</span>
-                </p>
+                {messages.map((message) => (
+                   <p className={`chat__message 
+                   ${message.name === user.displayName 
+                   && "chat__green"
+                   }`}>
+                        <span className="chat__name">{message.name}</span>
+                        {message.message}
+                        <span className="chat__timingStyle">
+                            {new Date(message.timestamp?.toDate()).toUTCString()}
+                        </span>
+                    </p>
+                ))}
             </div>
             <div className="chat__footer">
                 <InsertEmoticonIcon fontSize="large"/>
@@ -81,3 +111,4 @@ function Chat() {
 }
 
 export default Chat
+// 
