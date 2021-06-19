@@ -5,9 +5,10 @@ import Chat from './Chat.js';
 import Login from './Login.js';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 // third party imports
-
+import {useStateValue} from "./StateProvider.js"
+ 
 function App() {
-  const [user, setUser]  =useState(null);
+  const [{ user }, dispatch] = useStateValue();
   return (
     <div className='app'>
       {!user ? (

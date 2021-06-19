@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import './Sidebar.css'
 import SidebarChat from './SidebarChat.js'
+import {useStateValue} from "./StateProvider.js"
 // material imports
 import { Avatar } from '@material-ui/core';
 import DonutLargeIcon from '@material-ui/icons/DonutLarge';
@@ -13,6 +14,7 @@ import db from "./firebase"
 
 function Sidebar() {
     const [rooms, setRooms] = useState([]);
+    const [{user}, dispatch] = useStateValue();
 
     // having an empty array means that the useEffect will render and form only once, at the first time.
     // firebase takes a snapshop of the database whenever a change is detected, so snapshot is a way of detecting change.
@@ -30,7 +32,7 @@ function Sidebar() {
     return (
         <div className='sidebar'>
             <div className='sidebar__header'>
-                <Avatar/>
+                <Avatar src={user?.photoURL}/>
                 <div className="sidebar__headerRight">
                     <IconButton>
                         <DonutLargeIcon/>
