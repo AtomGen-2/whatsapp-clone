@@ -5,10 +5,24 @@ import { Avatar } from '@material-ui/core';
 // firebase imports
 import db from "./firebase"
 import { Link } from "react-router-dom";
+import firebase from "firebase";
 
 
 function SidebarChat({addNewChat, id, name}) {
     const [seed, setSeed] = useState('');
+    const [messages, setMessages] = useState("");
+
+    useEffect(()=>{
+        if (id){
+            db.collection('rooms')
+            .doc(id)
+            .collection("messages")
+            .orderBy("timestamp", "desc")
+            .onSnapshot((snapshot) =>(
+                setMessages(snapshot.docs.map((doc)=>doc.data()))
+            ));
+        }
+    },[id]);
     // loads again everytime a component is called, since its initialised with a blank array.
 
     const createChat = () => {
@@ -30,7 +44,7 @@ function SidebarChat({addNewChat, id, name}) {
                 <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`}/>
                 <div className="sidebarChat__info">
                     <h2>{name}</h2>
-                    <p>Last Message...</p>
+                    <p>{messages[0]?.message}</p>
                 </div>
             </div>
         </Link>

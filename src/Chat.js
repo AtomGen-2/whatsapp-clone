@@ -43,7 +43,6 @@ function Chat() {
     const sendMessage = (e) => {
         // this will prevent intermediate letters.
         e.preventDefault();
-        console.log("You typed >>>", input);
 
         db.collection('rooms').doc(roomId).collection('messages').add({
             message:input,
@@ -52,7 +51,6 @@ function Chat() {
         });
 
         setInput("");
-        console.log(user.displayName);
     }
 
     useEffect(()=>{
@@ -64,7 +62,10 @@ function Chat() {
                 <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`}/>
                 <div className="chat__headerInfo">
                     <h3>{roomName}</h3>
-                    <p className="para">Last seen at ...</p>
+                    <p className="para">
+                        {new Date(
+                            messages[messages.length-1]?.timestamp?.toDate()).toUTCString()}
+                    </p>
                 </div>
                 <div className="chat__headerRight">
                     <IconButton>
@@ -87,7 +88,7 @@ function Chat() {
                    }`}>
                         <span className="chat__name">{message.name}</span>
                         {message.message}
-                        <span className="chat__timingStyle">
+                        <span style={{color:'red'}}className="chat__dataTime">
                             {new Date(message.timestamp?.toDate()).toUTCString()}
                         </span>
                     </p>
